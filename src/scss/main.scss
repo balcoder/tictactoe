@@ -1,0 +1,59 @@
+html, body{
+  height: 100%;
+  margin: 0;
+}
+//wrapper for background gradient
+#wrapper {
+  min-height: 100%;
+  padding: 50px 0;
+  //background: linear-gradient(90deg, #E0E2E5, #919397);
+  background: linear-gradient(180deg, #E0E2E5, #91AAA2);
+}
+//main container for game
+#main {
+  max-width: 600px;
+  font-family: 'Gloria Hallelujah';
+  color: white;
+  box-shadow: 1px 3px 10px #333333;
+  border-radius: 20px;
+  background: #eded2f; /* Old browsers */
+  background: radial-gradient(ellipse at center,  #6B8C6D 0%,#27482D 100%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eded2f', endColorstr='#474919',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+}
+.square {
+  min-width: 200px;
+  min-height: 200px;
+  border-right: 5px solid #e0dbd1;
+  border-bottom: 5px solid #e0dbd1;
+  font-size: 9em;
+}
+//remove right side border
+#main .square:last-child {
+  border-right: none;
+}
+
+#row3 .square {
+  border-bottom: none;
+}
+
+.title {
+  border-radius: 20px 20px 0 0;
+  //background-color: #7C7C7C;
+  background-color: #012E1F;
+  padding: 20px;
+  font-size: 1.8em;
+  font-weight: bold;
+
+}
+.settings {
+  border-radius: 0 0 20px 20px;
+  //background-color: #7C7C7C;
+  background-color: #185340;
+}
+.settings .col-xs-4 {
+  padding: 20px 5px;
+  font-size: 16px;
+  font-weight: bold;
+
+}

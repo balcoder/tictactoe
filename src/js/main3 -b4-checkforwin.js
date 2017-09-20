@@ -42,20 +42,20 @@ function startGame() {
 //add clickevent listeners to all empty squares on the board and set marker to
 // whos turn it is
 function setupBoard(marker) {
-  var allSquares = document.querySelectorAll(".square");
+  var x = document.querySelectorAll(".square");
   var squareState = {};
   var i;
 
   //loop through each square adding to array if empty
 
-  for (i = 0; i < allSquares.length; i++) {
-      if(allSquares[i].innerHTML === "") {
-        document.getElementById(allSquares[i].getAttribute('id')).addEventListener('click', (function(){
-        console.log(allSquares[i].getAttribute('id'));
+  for (i = 0; i < x.length; i++) {
+      if(x[i].innerHTML === "") {
+        document.getElementById(x[i].getAttribute('id')).addEventListener('click', (function(){
+        console.log(x[i].getAttribute('id'));
         var num = i;
         return function() {
-            document.getElementById(allSquares[num].getAttribute('id')).innerHTML='X';
-            var nextId = allSquares[num].getAttribute('id');
+            document.getElementById(x[num].getAttribute('id')).innerHTML='X';
+            var nextId = x[num].getAttribute('id');
             squareState[nextId] = "x";
             // check for win here
             console.log(squareState);

@@ -102,11 +102,24 @@ function computerPlay(player){
     //prevent player from winning if two marks already
   }else if(computerMarker(computer, player, 'save')) {
     return;
-  } else {
+  } else  {
     // put mark in best position for win next go
-    if(checkForOne(computer)){}
-    else if(checkForOne(player)){}
-    else {markRandom()}
+    var idToMarkComp = checkForOne(computer);
+    var idToMarkPly = checkForOne(player);
+    if(idToMarkComp){
+      document.getElementById(idToMarkComp).innerHTML = computer;
+      squares = remove(squares,idToMarkComp);
+      return;
+    } else if(idToMarkPly){
+        document.getElementById(idToMarkComp).innerHTML = computer;
+        squares = remove(squares,idToMarkComp);
+        return;
+      }
+
+    else {
+      var item = squares[Math.floor(Math.random()*squares.length)];
+      document.getElementById(item).innerHTML = computer;
+    }
     return;
   }
   //Find out where to mark
@@ -207,15 +220,15 @@ function checkForOne(player) {
         ++twoEmpty;
         emptySlots.push(row[j]);
       }
-      if(document.getElementById(row[j]).innerHTML === player ){
+      else if(document.getElementById(row[j]).innerHTML === player ){
         ++haveOne;
       }
     }
     if(twoEmpty === 2 && haveOne === 1){
-      // var item = emptySlots[Math.floor(Math.random()*emptySlots.length)];
+       var item = emptySlots[Math.floor(Math.random()*emptySlots.length)];
       // document.getElementById(item).innerHTML = player;
-      // squares = remove(squares,item);
-      return true;
+       squares = remove(squares,item);
+      return item;
     }
   }
 

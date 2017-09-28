@@ -16,8 +16,8 @@ $(document).ready(function () {
     ['row1col1','row2col2','row3col3'],
     ['row1col3','row2col2','row3col1']
   ];
-
-  var squares = ['row1col1','row1col2','row1col3','row2col1','row2col2','row2col3''row3col1','row3col2','row3col3'];
+  // array to keep track of what squares are empty
+  var squares = ['row1col1','row1col2','row1col3','row2col1','row2col2','row2col3','row3col1','row3col2','row3col3'];
   //get all square elements
   var allSquares = document.querySelectorAll(".square");
 
@@ -57,11 +57,12 @@ function chooseMark(mark){
   }
 }
 
-//loop through each square adding click event if empty
+// loop through each square adding click event if empty
 function setupPlayer(player){
   var squareState = {};
   for (i = 0; i < allSquares.length; i++) {
       if(allSquares[i].innerHTML === "") {
+        // set up a click event for each square
         document.getElementById(allSquares[i].getAttribute('id')).addEventListener('click', (function(){
           var num = i;
           return function() {
@@ -72,11 +73,14 @@ function setupPlayer(player){
               --gameState;
               // check for win here
               if(checkForWin(player)){console.log ("WIN")}
-              messagePlayer('Your');
+              // check for draw
               if(gameState === 0){
                 document.getElementById('message').innerHTML= "It's a Draw";
               }
+              // computers turn
               computerPlay(player);
+              //message player its their turn
+              messagePlayer('Your');
           }
         })());
       }
@@ -92,7 +96,6 @@ function computerPlay(player){
   } else {
     computer = 'X';
   }
-  //var check = 'win'
   // try to win
   if (computerMarker(computer, player, 'win')){
     return;
@@ -101,14 +104,19 @@ function computerPlay(player){
     return;
   } else {
     // put mark in best position for win next go
+    if(checkForOne(computer)){}
+    else if(checkForOne(player)){}
+    else {markRandom()}
     return;
   }
   //Find out where to mark
   function computerMarker(computer, player, check){
     var checkMark =''
+    // if 3rd arg is win then computer tries to win
     if(arguments[2] === 'win'){
       checkMark = computer;
     }
+    // if arg 3 is save then computer tries to stop player winning
     if(arguments[2] === 'save'){
       checkMark = player;
     }
@@ -116,7 +124,7 @@ function computerPlay(player){
       let counter= 0;
       markedSquares.sort();
       if(found === 1){
-        // markedSquares has 2 id's, mark the third missing one
+        // markedSquares has 2 id's, mark the third missing one and return
         if(!markedSquares === 0){
           var id = winningRows[j-1][0];
           document.getElementById(id).innerHTML = computer;
@@ -130,9 +138,9 @@ function computerPlay(player){
           document.getElementById(id).innerHTML = computer;
           squares = remove(squares,id);
         }
-        for(let i = 0; i < winningRows[j-1].length; i++){
-          document.getElementById(winningRows[j-1][i]).style.color = 'green';
-        }
+        // for(let i = 0; i < winningRows[j-1].length; i++){
+        //   document.getElementById(winningRows[j-1][i]).style.color = 'green';
+        //}
         return true;
       }
       //empty the array before looping through each winningRow
@@ -156,20 +164,62 @@ for (var square in squareState) {
   }
 }
 
-
-
-
 function checkForWin(player) {
   var win = 0;
+  var greenIds = [];
   //check each winning combo
-  winningRows.forEach(function(winningRow){
-    if(winningRow.every(function(square){
+  //winningRows.forEach(function(winningRow){
+  for(var i = 0; i < winningRows.length; i++){
+    if(greenIds.length === 3){
+      win = 1;
+      for(var j = 0; j < 3; j++){
+        document.getElementById(greenIds[j]).style.color = 'green';
+      }
+      break;
+    }
+    greenIds = [];
+    for(let k = 0; k < 3; k++){
       // look for player mark in winningrow combos
-      return player === document.getElementById(square).innerHTML;
+      if( player === document.getElementById(winningRows[i][k]).innerHTML){
+        greenIds.push(winningRows[i][k]);
+      }
+      //return player === document.getElementById(square).innerHTML;
 
-    })){win = 1;}
-  });
-  if(win === 1) return true;
+    }
+
+  //});
+}
+  if(win === 1){
+    return true;
+  }
+}
+
+
+
+function checkForOne(player) {
+  for(let i = 0; i < winningRows.length; i++){
+    var row = winningRows[i];
+    var twoEmpty = 0;
+    var emptySlots = [];
+    var haveOne = 0;
+    for (let j = 0; j < row.length; j++){
+      if(document.getElementById(row[j]).innerHTML === '' ){
+        ++twoEmpty;
+        emptySlots.push(row[j]);
+      }
+      if(document.getElementById(row[j]).innerHTML === player ){
+        ++haveOne;
+      }
+    }
+    if(twoEmpty === 2 && haveOne === 1){
+      // var item = emptySlots[Math.floor(Math.random()*emptySlots.length)];
+      // document.getElementById(item).innerHTML = player;
+      // squares = remove(squares,item);
+      return true;
+    }
+  }
+
+
 }
 
 

@@ -86,10 +86,10 @@ function clickSquare(){
       }
   }
 }
-
+var clickMe = clickSquare;
 function removeClickEvents(){
   for (let i = 0; i < allSquares.length; i++) {
-    document.getElementById(allSquares[i].getAttribute('id')).removeEventListener('click', clickSquare());
+    document.getElementById(allSquares[i].getAttribute('id')).removeEventListener('click', (clickMe)());
   }
 }
 
@@ -99,7 +99,7 @@ function setupPlayer(player){
   for (i = 0; i < allSquares.length; i++) {
       if(allSquares[i].innerHTML === "") {
         // set up a click event for each square
-         document.getElementById(allSquares[i].getAttribute('id')).addEventListener('click', (clickSquare
+         document.getElementById(allSquares[i].getAttribute('id')).addEventListener('click', (clickMe
         // function(){
         //   var num = i;
         //   return function() {
@@ -149,17 +149,20 @@ function computerPlay(player){
     if(idToMarkComp){
       document.getElementById(idToMarkComp).innerHTML = computer;
       squares = remove(squares,idToMarkComp);
+      --gameState;
       return;
     } else if(idToMarkPly){
         document.getElementById(idToMarkPly).innerHTML = computer;
         squares = remove(squares,idToMarkPly);
+        --gameState;
         return;
       }
 
     else {
-      if(squares.lenght != 0){
+      if(squares.lenght != 0 && gameState != 0){
       var item = squares[Math.floor(Math.random()*squares.length)];
       document.getElementById(item).innerHTML = computer;
+      --gameState;
       }
     }
     return;
@@ -189,6 +192,7 @@ function computerPlay(player){
           if(document.getElementById(id).innerHTML ===''){
           document.getElementById(id).innerHTML = computer;
           squares = remove(squares,id);
+          --gameState;
           markedSquares = [];
            return true;
           }
@@ -197,6 +201,7 @@ function computerPlay(player){
           if(document.getElementById(id).innerHTML === ''){
           document.getElementById(id).innerHTML = computer;
           squares = remove(squares,id);
+          --gameState;
           markedSquares = [];
            return true;
           }
@@ -205,6 +210,7 @@ function computerPlay(player){
           if(document.getElementById(id).innerHTML === ''){
           document.getElementById(id).innerHTML = computer;
           squares = remove(squares,id);
+          --gameState;
           markedSquares = [];
            return true;
           }

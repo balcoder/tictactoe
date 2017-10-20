@@ -1,4 +1,3 @@
-// object to keep account of games won
 var scores = {
   player: "0",
   computer: "0"
@@ -75,52 +74,6 @@ function startGame() {
       }
   }
 
-
-  function clickSquare(){
-    var num = i;
-    return function() {
-        //prevent user from clicking already clicked square using data
-        // attributes
-        //if(e.currentTarget.dataset.triggered) return;
-        //e.currentTarget.dataset.triggered = true;
-        // set marker for the square to the player mark
-        allSquares[num].innerHTML=player;
-        var nextId = allSquares[num].getAttribute('id');
-        // keep list of empty square id's
-        squares = remove(squares,nextId);
-        // squareState[nextId] = player;
-        //keeps track for draw
-        --gameState;
-        // check for win here
-        checkForWin(player)
-        if(win === 1){
-          document.getElementById('message').innerHTML= "You Win!";
-          scores.player = ++scores.player;
-          document.getElementById('player').innerHTML= "Player: " + scores.player;
-          document.getElementById('hidden').classList.remove("hidden")
-          removeClickEvents()
-          return;
-          // check for draw
-        } else if(win === 0 && gameState === 0) {
-          document.getElementById('message').innerHTML= "It's a Draw";
-
-          return;
-        } else {
-        // computers turn
-          computerPlay(player);
-        }
-
-    }
-  }
-
-  function removeClickEvents(){
-    for (id in listeners) {
-      if(listeners[id]){
-        document.getElementById(id).removeEventListener('click', listeners[id]);
-      }
-
-    }
-  }
   function computerPlay(player){
     //wait one second before computer plays, nicer effect
     setTimeout(function(){
@@ -163,6 +116,20 @@ function startGame() {
         }
       }
       return;
+    }
+
+    function computerMarkWIn(mark, arr) {
+      // return id to mark for computer win
+      winningRows.forEach(function(row){
+        if(row.filter(function(el){
+          return document.getElementById(el).innerHTML === mark}).length === 2) {
+            var id = row.filter(function(el){ return document.getElementById(el).innerHTML === ''})
+            if(id.length === 1) {
+              return id;
+            }
+          }
+      });
+
     }
 
     //Find out where to mark
@@ -259,79 +226,4 @@ function startGame() {
       }
     }
     }, 1000);
-  }
-
-  function checkForOne(player) {
-    for(let i = 0; i < winningRows.length; i++){
-      var row = winningRows[i];
-      var twoEmpty = 0;
-      var emptySlots = [];
-      var haveOne = 0;
-      for (let j = 0; j < row.length; j++){
-        if(document.getElementById(row[j]).innerHTML === '' ){
-          ++twoEmpty;
-          emptySlots.push(row[j]);
-        }
-        else if(document.getElementById(row[j]).innerHTML === player ){
-          ++haveOne;
-        }
-      }
-      if(twoEmpty === 2 && haveOne === 1){
-         var item = emptySlots[Math.floor(Math.random()*emptySlots.length)];
-        // document.getElementById(item).innerHTML = player;
-         squares = remove(squares,item);
-        return item;
-      }
-    }
-  }
-  function checkForWin(player) {
-    // store winnig id's here
-    var greenIds = [];
-    //check each winning combo
-    for(var i = 0; i < winningRows.length; i++){
-      if(greenIds.length === 3){
-        win = 1;
-        for(var j = 0; j < 3; j++){
-          document.getElementById(greenIds[j]).style.color = 'green';
-        }
-        //break;
-        return;
-      }
-      greenIds = [];
-      win = 0;
-      for(let k = 0; k < 3; k++){
-        // look for player mark in winningrow combos
-        if( player === document.getElementById(winningRows[i][k]).innerHTML){
-          greenIds.push(winningRows[i][k]);
-        }
-      }
-    }
-    if(win === 1){
-      document.getElementById("yourTurn").innerHTML = 'We have a winner';
-      removeClickEvents();
-      return;
-    }
-  }
-  //Change the message
-  function messagePlayer (player) {
-    document.getElementById("yourTurn").innerHTML = player + 'turn';
-  }
-
-  function clearSquares() {
-    //select all elements with class of square
-    var x = document.querySelectorAll(".square");
-    var i;
-    //set each square to blank
-    for (i = 0; i < x.length; i++) {
-        x[i].innerHTML = "";
-    }
-  }
-
-  function reset() {
-    clearSquares();
-    removeClickEvents();
-    startGame();
-  }
-  function remove(array, element) {
-      return array.filter(e => e !== element);
   }

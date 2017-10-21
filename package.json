@@ -8,7 +8,6 @@
     "type": "git",
     "url": "https://github.com/balcoder/tictactoe"
   },
-
   "keywords": [
     "FreeCodeCamp",
     "tictactoe",
@@ -21,7 +20,7 @@
     "clean": "rimraf dist/{css/*,js/*,images/*}",
     "autoprefixer": "postcss -u autoprefixer -r dist/css/*",
     "scss": "node-sass --output-style compressed -o dist/css src/scss",
-    "lint": "eslint src/js || true",
+    "lint": "prettier --single-quote --trailing-comma es5 --write src/js/**/*.js || true",
     "lint-scss": "stylelint src/scss/*.scss --syntax scss || true",
     "uglify": "mkdirp dist/js -p && uglifyjs src/js/*.js -m -o dist/js/app.js && uglifyjs src/js/*.js -m -c -o dist/js/app.min.js",
     "imagemin": "imagemin src/images/* -o dist/images",
@@ -50,6 +49,7 @@
     "npm-run-all": "^2.1.1",
     "onchange": "^2.4.0",
     "postcss-cli": "^2.5.2",
+    "prettier": "1.7.4",
     "rimraf": "^2.5.4",
     "stylelint": "^7.8.0",
     "svg-sprite-generator": "0.0.7",

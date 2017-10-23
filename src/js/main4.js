@@ -30,12 +30,15 @@ var squares = [
   'row3col2',
   'row3col3',
 ];
+var squaresCopy = [];
 //get all square elements
 var allSquares = document.querySelectorAll('.square');
 // keep track of win
 var win = 0;
-//reset scores to zero and clear squares
-document.getElementById('reset').addEventListener('click', reset);
+// full reset
+document.getElementById('reset').addEventListener('click', fullReset);
+// clear board and play another
+document.getElementById('hidden').addEventListener('click', subReset);
 // the main game
 startGame();
 function startGame() {
@@ -71,172 +74,188 @@ function chooseMark(mark) {
 }
 // loop through each square adding click event if empty
 function setupPlayer(player) {
-  //var squareState = {};
+  squaresCopy = squares.slice();
   for (i = 0; i < allSquares.length; i++) {
     if (allSquares[i].innerHTML === '') {
       // store listener for later removal
       listeners[i] = clickSquare(i);
-      //listeners[allSquares[i].id] = clickSquare(i);
+
       // set up a click event for each square
       allSquares[i].addEventListener('click', listeners[i]);
-      //allSquares[i].addEventListener('click', listeners[allSquares[i].id]);
+    }
+  }
+  document.getElementById('hidden').className = 'hidden';
+}
+
+function clickSquare() {
+  var num = i;
+  return function() {
+    // set marker for the square to the player mark
+    allSquares[num].innerHTML = player;
+    var nextId = allSquares[num].getAttribute('id');
+    // keep list of empty square id's
+    squaresCopy = remove(squaresCopy, nextId);
+    // check for win here
+    var markWinArr = checkForWin(player, winningRows);
+    if (markWinArr) {
+      scores.player = ++scores.player;
+      document.getElementById('player').innerHTML = 'Player : ' + scores.player;
+      runWinTask(markWinArr, player);
+    } else if (squaresCopy.length === 0) {
+      // check for draw
+      document.getElementById('message').innerHTML = "It's a Draw";
+      document.getElementById('hidden').classList.remove('hidden');
+    } else {
+      // computers turn
+      computerPlay(player);
+    }
+  };
+}
+
+function checkForWin(mark, array) {
+  // checks for 3  marks on  winning Row and returns an array
+  // with their id's or false
+  for (var i = 0; i < array.length; i++) {
+    //array.forEach(function(row) {
+    var markedRow = array[i].filter(function(id) {
+      return document.getElementById(id).innerHTML === mark;
+    });
+    if (markedRow.length === 3) {
+      return markedRow;
+    }
+  }
+  //});
+  return false;
+}
+
+function runWinTask(winningArr, player) {
+  // tasks to run after win
+  greenWinningRow(winningArr);
+  removeClickEvents();
+  document.getElementById('message').innerHTML = player + ' Wins!';
+  document.getElementById('hidden').classList.remove('hidden');
+}
+function greenWinningRow(row) {
+  // takes an array of id's and changes color to green
+  row.forEach(function(id) {
+    document.getElementById(id).style.color = 'green';
+  });
+}
+
+function computerPlay() {
+  // returns id to play for computer
+  setTimeout(function() {
+    var idToMarkComp = checkForTwo(computer, winningRows);
+    if (idToMarkComp) {
+      document.getElementById(idToMarkComp).innerHTML = computer;
+      squaresCopy = remove(squaresCopy, idToMarkComp);
+      var testCompWin = checkForWin(computer, winningRows);
+      if (testCompWin) {
+        runWinTask(testCompWin, computer);
+        scores.computer = ++scores.computer;
+        document.getElementById('computer').innerHTML =
+          'Computer : ' + scores.computer;
+      }
+      return;
+    }
+    var idToMarkPly = checkForTwo(player, winningRows);
+    if (idToMarkPly) {
+      document.getElementById(idToMarkPly).innerHTML = computer;
+      squaresCopy = remove(squaresCopy, idToMarkPly);
+      return;
+    }
+    var idForOne = checkForOne(computer, winningRows);
+    if (idForOne) {
+      document.getElementById(idForOne).innerHTML = computer;
+      squaresCopy = remove(squaresCopy, idForOne);
+      return;
+    }
+    var rndSquareId =
+      squaresCopy[Math.floor(Math.random() * squaresCopy.length)];
+    document.getElementById(rndSquareId).innerHTML = computer;
+    squaresCopy = remove(squaresCopy, rndSquareId);
+  }, 500);
+} // end of computerPlay()
+
+function fullReset() {
+  location.reload();
+}
+
+function subReset() {
+  // soft reset clears squares and resets click events
+  // scores.player = '0';
+  // scores.computer = '0';
+  document.getElementById('message').innerHTML =
+    'You are ' + player + ' and Computer is ' + computer;
+  win = 0;
+  removeClickEvents();
+  listeners = [];
+  cleanSquares();
+  setupPlayer(player);
+}
+
+function cleanSquares() {
+  for (var i = 0; i < allSquares.length; i++) {
+    allSquares[i].innerHTML = '';
+    allSquares[i].style.color = 'white';
+  }
+}
+function checkForTwo(mark, arr) {
+  // checks for two same marks in array of 3 id's and returns
+  // third empty id
+  for (var i = 0; i < arr.length; i++) {
+    var rowCopy = arr[i].slice();
+    arr[i].forEach(function(id, index) {
+      if (document.getElementById(id).innerHTML === mark) {
+        var indexToSplice = rowCopy.indexOf(id);
+        rowCopy.splice(indexToSplice, 1);
+      }
+    });
+    if (
+      rowCopy.length === 1 &&
+      document.getElementById(rowCopy[0]).innerHTML === ''
+    ) {
+      var myId = rowCopy[0];
+      return myId;
+    }
+  }
+  return false;
+}
+
+function checkForOne(mark, arr) {
+  // checks for only one mark on a row of id's and returns
+  // one of the remaining id's
+  //arr.forEach(function(row) {
+  for (var i = 0; i < arr.length; i++) {
+    var rowCopy = arr[i].filter(function(id) {
+      return document.getElementById(id).innerHTML === '';
+    });
+    if (rowCopy.length === 2) {
+      // rowCopy has two empty squares
+      var markedIndex = arr[i].filter(function(id) {
+        return document.getElementById(id).innerHTML === mark;
+      });
+      if (markedIndex.length === 1) {
+        var rnd = Math.floor(Math.random() * rowCopy.length);
+        return rowCopy[rnd];
+      }
+    }
+  }
+  //});
+  return false;
+}
+
+function removeClickEvents() {
+  for (var i = 0; i < allSquares.length; i++) {
+    if (listeners[i]) {
+      document
+        .getElementById(allSquares[i].id)
+        .removeEventListener('click', listeners[i]);
     }
   }
 }
-
-function computerPlay(player) {
-  //wait one second before computer plays, nicer effect
-  setTimeout(function() {
-    var computer;
-    var markedSquares = [];
-    var found = 0;
-    if (player === 'X') {
-      computer = 'O';
-    } else {
-      computer = 'X';
-    }
-    //prevent player from winning if two marks already on winning row
-    if (computerMarker(computer, player, 'save')) {
-      return;
-      // try to win by looking for 2 computer marks on winning row
-    } else if (computerMarker(computer, player, 'win')) {
-      return;
-    } else {
-      // put mark in best position for win next go
-      var idToMarkComp = checkForOne(computer);
-      var idToMarkPly = checkForOne(player);
-      if (idToMarkComp) {
-        document.getElementById(idToMarkComp).innerHTML = computer;
-        squares = remove(squares, idToMarkComp);
-        --gameState;
-        return;
-      } else if (idToMarkPly) {
-        document.getElementById(idToMarkPly).innerHTML = computer;
-        squares = remove(squares, idToMarkPly);
-        --gameState;
-        return;
-      } else {
-        if (squares.lenght != 0 && gameState != 0) {
-          var item = squares[Math.floor(Math.random() * squares.length)];
-          document.getElementById(item).innerHTML = computer;
-          --gameState;
-        }
-      }
-      return;
-    }
-
-    function computerMarkWIn(mark, arr) {
-      // return id to mark for computer win
-      winningRows.forEach(function(row) {
-        if (
-          row.filter(function(el) {
-            return document.getElementById(el).innerHTML === mark;
-          }).length === 2
-        ) {
-          var id = row.filter(function(el) {
-            return document.getElementById(el).innerHTML === '';
-          });
-          if (id.length === 1) {
-            return id;
-          }
-        }
-      });
-    }
-
-    //Find out where to mark
-    function computerMarker(computer, player, check) {
-      var checkMark = '';
-      var markSaved = 0;
-      found = 0;
-      if (check === 'win') {
-        checkMark = computer;
-      } else {
-        checkMark = player;
-      }
-      for (var j = 0; j < winningRows.length; j++) {
-        var counter = 0;
-        markedSquares.sort();
-        if (found === 1) {
-          // markedSquares has 2 id's, mark the third missing one
-          if (markedSquares[0] != 0) {
-            var id = winningRows[j - 1][0];
-            if (document.getElementById(id).innerHTML === '') {
-              document.getElementById(id).innerHTML = computer;
-              squares = remove(squares, id);
-              --gameState;
-              markedSquares = [];
-              if (check === 'win') {
-                win = 1;
-              }
-              if (check === 'save') {
-                markSaved = 1;
-              }
-              //return true;
-            }
-          } else if (markedSquares[1] != 1) {
-            var id = winningRows[j - 1][1];
-            if (document.getElementById(id).innerHTML === '') {
-              document.getElementById(id).innerHTML = computer;
-              squares = remove(squares, id);
-              --gameState;
-              markedSquares = [];
-              if (check === 'win') {
-                win = 1;
-              }
-              if (check === 'save') {
-                markSaved = 1;
-              }
-              //return true;
-            }
-          } else {
-            var id = winningRows[j - 1][2];
-            if (document.getElementById(id).innerHTML === '') {
-              document.getElementById(id).innerHTML = computer;
-              squares = remove(squares, id);
-              --gameState;
-              markedSquares = [];
-              if (check === 'win') {
-                win = 1;
-              }
-              if (check === 'save') {
-                markSaved = 1;
-              }
-              //return true;
-            }
-          }
-          markedSquares = [];
-          if (win === 1) {
-            checkForWin(computer);
-            document.getElementById('message').innerHTML = 'Computer Wins!';
-
-            return true;
-          }
-          // check for save and no win
-          if (check === 'save' && markSaved === 1) {
-            return true;
-          }
-          // check for draw
-          if (win === 0 && gameState === 0) {
-            document.getElementById('message').innerHTML = "It's a Draw";
-            return;
-          }
-          return false;
-        }
-        //empty the array before looping through each winningRow
-        markedSquares = [];
-        for (var i = 0; i < winningRows[j].length; i++) {
-          if (
-            document.getElementById(winningRows[j][i]).innerHTML === checkMark
-          ) {
-            markedSquares.push(i);
-            ++counter;
-            if (counter === 2) {
-              found = 1;
-              break;
-            }
-          }
-        }
-      }
-    }
-  }, 1000);
+function remove(array, element) {
+  return array.filter(function(e) {
+    return e !== element;
+  });
 }

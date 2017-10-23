@@ -122,12 +122,15 @@ function clickSquare() {
 }
 
 function removeClickEvents() {
-  for (id in listeners) {
-    if (listeners[id]) {
-      document.getElementById(id).removeEventListener('click', listeners[id]);
+  for (var i = 0; i < allSquares.length; i++) {
+    if (listeners[i]) {
+      document
+        .getElementById(allSquares[i].id)
+        .removeEventListener('click', listeners[i]);
     }
   }
 }
+
 function computerPlay(player) {
   //wait one second before computer plays, nicer effect
   setTimeout(function() {
